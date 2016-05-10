@@ -58,8 +58,6 @@
 		2D0993D51CE1D73E00ACB896 /* GetItems */ = {
 			isa = PBXGroup;
 			children = (
-				2D0993D91CE1D73E00ACB896 /* AppDelegate.h */,
-				2D0993DA1CE1D73E00ACB896 /* AppDelegate.m */,
 				2D0993DC1CE1D73E00ACB896 /* ViewController.h */,
 				2D0993DD1CE1D73E00ACB896 /* ViewController.m */,
 				2D0993DF1CE1D73E00ACB896 /* Main.storyboard */,
@@ -74,6 +72,8 @@
 		2D0993D61CE1D73E00ACB896 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				2D0993D91CE1D73E00ACB896 /* AppDelegate.h */,
+				2D0993DA1CE1D73E00ACB896 /* AppDelegate.m */,
 				2D0993D71CE1D73E00ACB896 /* main.m */,
 			);
 			name = "Supporting Files";
