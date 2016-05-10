@@ -13,6 +13,8 @@
 		2D0993E31CE1D73E00ACB896 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2D0993E21CE1D73E00ACB896 /* Assets.xcassets */; };
 		2D0993E61CE1D73E00ACB896 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2D0993E41CE1D73E00ACB896 /* LaunchScreen.storyboard */; };
 		2D0993EF1CE1D89100ACB896 /* JournalItemsCollectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D0993EE1CE1D89100ACB896 /* JournalItemsCollectionViewController.m */; };
+		2D0993F21CE1D94900ACB896 /* ModelJournalData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2D0993F01CE1D94900ACB896 /* ModelJournalData.xcdatamodeld */; };
+		2D0993FC1CE1EA7000ACB896 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D0993FB1CE1EA7000ACB896 /* Item.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +28,9 @@
 		2D0993E71CE1D73E00ACB896 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2D0993ED1CE1D89100ACB896 /* JournalItemsCollectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JournalItemsCollectionViewController.h; sourceTree = "<group>"; };
 		2D0993EE1CE1D89100ACB896 /* JournalItemsCollectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JournalItemsCollectionViewController.m; sourceTree = "<group>"; };
+		2D0993F11CE1D94900ACB896 /* ModelJournalData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ModelJournalData.xcdatamodel; sourceTree = "<group>"; };
+		2D0993FA1CE1EA7000ACB896 /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Item.h; path = ../Item.h; sourceTree = "<group>"; };
+		2D0993FB1CE1EA7000ACB896 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = ../Item.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,7 +63,10 @@
 		2D0993D51CE1D73E00ACB896 /* GetItems */ = {
 			isa = PBXGroup;
 			children = (
+				2D0993FA1CE1EA7000ACB896 /* Item.h */,
+				2D0993FB1CE1EA7000ACB896 /* Item.m */,
 				2D0993DF1CE1D73E00ACB896 /* Main.storyboard */,
+				2D0993F01CE1D94900ACB896 /* ModelJournalData.xcdatamodeld */,
 				2D0993ED1CE1D89100ACB896 /* JournalItemsCollectionViewController.h */,
 				2D0993EE1CE1D89100ACB896 /* JournalItemsCollectionViewController.m */,
 				2D0993E21CE1D73E00ACB896 /* Assets.xcassets */,
@@ -149,9 +157,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D0993FC1CE1EA7000ACB896 /* Item.m in Sources */,
 				2D0993EF1CE1D89100ACB896 /* JournalItemsCollectionViewController.m in Sources */,
 				2D0993DB1CE1D73E00ACB896 /* AppDelegate.m in Sources */,
 				2D0993D81CE1D73E00ACB896 /* main.m in Sources */,
+				2D0993F21CE1D94900ACB896 /* ModelJournalData.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +314,19 @@
 			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		2D0993F01CE1D94900ACB896 /* ModelJournalData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2D0993F11CE1D94900ACB896 /* ModelJournalData.xcdatamodel */,
+			);
+			currentVersion = 2D0993F11CE1D94900ACB896 /* ModelJournalData.xcdatamodel */;
+			path = ModelJournalData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 2D0993CB1CE1D73E00ACB896 /* Project object */;
 }
