@@ -48,7 +48,7 @@ static NSString * const reuseIdentifier = @"Cell";
         JournalItem *journalItem= [[JournalItem alloc] init];
         journalItem.shortName = item[@"shortName"];
         journalItem.publishedDate = item[@"publishedDate"];
-        journalItem.smallCoverId = [item[@"smallCoverId"] integerValue];
+        //journalItem.smallCoverId = [item[@"smallCoverId"] integerValue];
         [self.array addObject:journalItem];
     }
     
@@ -82,6 +82,7 @@ static NSString * const reuseIdentifier = @"Cell";
     
     cell.publishedDate.text = item.publishedDate;
     cell.title.text = item.shortName;
+    cell.image.image = item.smallCover;
     
     return cell;
 }

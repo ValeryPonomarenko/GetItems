@@ -7,9 +7,10 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 @interface JournalItem : NSObject
 @property (nonatomic, copy) NSString *shortName;
 @property (nonatomic, copy) NSString *publishedDate;
-@property (nonatomic) NSUInteger smallCoverId;
+@property (nonatomic) UIImage *smallCover;
 @end
