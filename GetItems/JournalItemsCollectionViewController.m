@@ -28,11 +28,25 @@ static NSString * const reuseIdentifier = @"Cell";
     [self downloadData];
 }
 
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    NSURLCache *URLCache = [[NSURLCache alloc] initWithMemoryCapacity:20*1024*1024
+                                                         diskCapacity:40*1024*1024
+                                                             diskPath:nil];
+    [NSURLCache setSharedURLCache:URLCache];
+    sleep(1);
+    
+    return YES;
+}
+
 - (void)downloadData
 {
     NSURL *url = [[NSURL alloc] initWithString:@"http://pubbledone.devsky.ru/api/items?appId=deus"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    config.URLCache = [NSURLCache sharedURLCache];
+    config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
+    
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
     
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
@@ -88,11 +102,14 @@ static NSString * const reuseIdentifier = @"Cell";
     cell.publishedDate.text = item.publishedDate;
     cell.title.text = item.shortName;
 
-    //download img from the website
+    //download img from the web
     NSString *imgPath = [NSString stringWithFormat:@"http://pubbledone.devsky.ru/api/images/%d", item.smallCoverId];
     NSURL *url = [[NSURL alloc] initWithString:imgPath];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    config.URLCache = [NSURLCache sharedURLCache];
+    config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
+    
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
     
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
@@ -100,10 +117,22 @@ static NSString * const reuseIdentifier = @"Cell";
     {
         item.imgUrl = [[NSURL alloc] initWithString:[NSJSONSerialization JSONObjectWithData:data options:0 error:nil][@"filePath"]];
         
-        NSData *imgData = [NSData dataWithContentsOfURL:item.imgUrl];
-    
-        item.smallCover = [UIImage imageWithData:imgData];
-        dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
+        
+        //download image
+        NSURLRequest *request = [NSURLRequest requestWithURL:item.imgUrl];
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        config.URLCache = [NSURLCache sharedURLCache];
+        config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
+        
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+        
+        NSURLSessionDataTask *task = [session dataTaskWithRequest:request
+                                                completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+        {
+            item.smallCover = [UIImage imageWithData:data];
+            dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
+        }];
+        [task resume];
     }];
     [task resume];
     
