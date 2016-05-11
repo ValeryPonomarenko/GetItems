@@ -25,33 +25,38 @@ static NSString * const reuseIdentifier = @"Cell";
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
 
     self.array = [[NSMutableArray alloc] init];
-    
+    [self downloadData];
+}
+
+- (void)downloadData
+{
     NSURL *url = [[NSURL alloc] initWithString:@"http://pubbledone.devsky.ru/api/items?appId=deus"];
     NSURLRequest *request = [NSURLRequest requestWithURL:url];
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
     
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                  completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+                                            completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
     {
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-        dispatch_async(dispatch_get_main_queue(), ^{ [self makeView:dict]; });
+        
+        for(id item in dict[@"_embedded"][@"items"])
+        {
+            JournalItem *journalItem= [[JournalItem alloc] init];
+            journalItem.shortName = item[@"shortName"];
+            journalItem.publishedDate = item[@"publishedDate"];
+            journalItem.smallCoverId = [item[@"smallCoverId"] integerValue];
+
+            [self.array addObject:journalItem];
+        }
+        
+        dispatch_async(dispatch_get_main_queue(), ^{ [self makeView]; });
     }];
-    
     [task resume];
 }
 
-- (void)makeView:(NSDictionary *)dict
+- (void)makeView
 {
-    for(id item in dict[@"_embedded"][@"items"])
-    {
-        JournalItem *journalItem= [[JournalItem alloc] init];
-        journalItem.shortName = item[@"shortName"];
-        journalItem.publishedDate = item[@"publishedDate"];
-        //journalItem.smallCoverId = [item[@"smallCoverId"] integerValue];
-        [self.array addObject:journalItem];
-    }
-    
     [self.collectionView performBatchUpdates:^{
         NSMutableArray *arrayWithIndexPaths = [NSMutableArray array];
         
@@ -82,7 +87,25 @@ static NSString * const reuseIdentifier = @"Cell";
     
     cell.publishedDate.text = item.publishedDate;
     cell.title.text = item.shortName;
-    cell.image.image = item.smallCover;
+
+    //download img from the website
+    NSString *imgPath = [NSString stringWithFormat:@"http://pubbledone.devsky.ru/api/images/%d", item.smallCoverId];
+    NSURL *url = [[NSURL alloc] initWithString:imgPath];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+    
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
+                                            completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+    {
+        item.imgUrl = [[NSURL alloc] initWithString:[NSJSONSerialization JSONObjectWithData:data options:0 error:nil][@"filePath"]];
+        
+        NSData *imgData = [NSData dataWithContentsOfURL:item.imgUrl];
+    
+        item.smallCover = [UIImage imageWithData:imgData];
+        dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
+    }];
+    [task resume];
     
     return cell;
 }
