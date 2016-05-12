@@ -25,6 +25,7 @@ static NSString * const reuseIdentifier = @"Cell";
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
 
     self.array = [[NSMutableArray alloc] init];
+    
     [self downloadData];
 }
 
@@ -50,8 +51,13 @@ static NSString * const reuseIdentifier = @"Cell";
     NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
     
     NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
+                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
     {
+        if(!data)
+        {
+            return;
+        }
+        
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
         
         for(id item in dict[@"_embedded"][@"items"])
@@ -69,6 +75,53 @@ static NSString * const reuseIdentifier = @"Cell";
     [task resume];
 }
 
+- (void)downloadJournalImages:(JournalItem *)item withCell:(ItemCollectionViewCell *)cell
+{
+    NSString *imgPath = [NSString stringWithFormat:@"http://pubbledone.devsky.ru/api/images/%d", item.smallCoverId];
+    NSURL *url = [[NSURL alloc] initWithString:imgPath];
+    NSURLRequest *request = [NSURLRequest requestWithURL:url];
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+    config.URLCache = [NSURLCache sharedURLCache];
+    config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
+    
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+    
+    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
+                                            completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+    {
+        if(!data)
+        {
+            return;
+        }
+        
+        item.imgUrl = [[NSURL alloc] initWithString:[NSJSONSerialization JSONObjectWithData:data options:0 error:nil][@"filePath"]];
+
+        //download image
+        NSURLRequest *request = [NSURLRequest requestWithURL:item.imgUrl];
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
+        config.URLCache = [NSURLCache sharedURLCache];
+        config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
+
+        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
+
+        NSURLSessionDataTask *task = [session dataTaskWithRequest:request
+                                              completionHandler:^(NSData *data, NSURLResponse *response, NSError *error)
+        {
+            item.smallCover = [self getImage:[NSString stringWithFormat: @"%d", item.smallCoverId]];
+            
+            if(item.smallCover == nil)
+            {
+                item.smallCover = [UIImage imageWithData:data];
+                [self saveImage:[NSString  stringWithFormat:@"%d", item.smallCoverId] andImage:item.smallCover];
+            }
+            
+            dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
+        }];
+        [task resume];
+    }];
+    [task resume];
+}
+
 - (void)makeView
 {
     [self.collectionView performBatchUpdates:^{
@@ -80,6 +133,27 @@ static NSString * const reuseIdentifier = @"Cell";
         }
         [self.collectionView insertItemsAtIndexPaths:arrayWithIndexPaths];
     } completion:nil];
+}
+
+- (void)saveImage:(NSString *)name andImage:(UIImage *)image
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingString:[NSString stringWithFormat:@"%@.png", name]];
+    
+    [UIImagePNGRepresentation(image) writeToFile:filePath atomically:YES];
+    
+    NSLog(@"%@", filePath);
+}
+
+- (UIImage *)getImage:(NSString *)name
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+    NSString *filePath = [[paths objectAtIndex:0] stringByAppendingString:[NSString stringWithFormat:@"%@.png", name]];
+    
+    NSData *img = [NSData dataWithContentsOfFile:filePath];
+    UIImage *image = [UIImage imageWithData:img];
+    
+    return image;
 }
 
 #pragma mark <UICollectionViewDataSource>
@@ -101,40 +175,9 @@ static NSString * const reuseIdentifier = @"Cell";
     
     cell.publishedDate.text = item.publishedDate;
     cell.title.text = item.shortName;
-
+    
     //download img from the web
-    NSString *imgPath = [NSString stringWithFormat:@"http://pubbledone.devsky.ru/api/images/%d", item.smallCoverId];
-    NSURL *url = [[NSURL alloc] initWithString:imgPath];
-    NSURLRequest *request = [NSURLRequest requestWithURL:url];
-    NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-    config.URLCache = [NSURLCache sharedURLCache];
-    config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
-    
-    NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
-    
-    NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                            completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
-    {
-        item.imgUrl = [[NSURL alloc] initWithString:[NSJSONSerialization JSONObjectWithData:data options:0 error:nil][@"filePath"]];
-        
-        
-        //download image
-        NSURLRequest *request = [NSURLRequest requestWithURL:item.imgUrl];
-        NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-        config.URLCache = [NSURLCache sharedURLCache];
-        config.requestCachePolicy = NSURLRequestReturnCacheDataElseLoad;
-        
-        NSURLSession *session = [NSURLSession sessionWithConfiguration:config];
-        
-        NSURLSessionDataTask *task = [session dataTaskWithRequest:request
-                                                completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response, NSError * _Nullable error)
-        {
-            item.smallCover = [UIImage imageWithData:data];
-            dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
-        }];
-        [task resume];
-    }];
-    [task resume];
+    [self downloadJournalImages:item withCell:cell];
     
     return cell;
 }
