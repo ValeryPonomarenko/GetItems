@@ -112,7 +112,7 @@ static NSString * const reuseIdentifier = @"Cell";
             if(item.smallCover == nil)
             {
                 item.smallCover = [UIImage imageWithData:data];
-                [self saveImage:[NSString  stringWithFormat:@"%d", item.smallCoverId] andImage:item.smallCover];
+                [self saveImage:[NSString  stringWithFormat:@"%d", item.smallCoverId] andImage:[UIImage imageWithData:data]];
             }
             
             dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
@@ -149,7 +149,7 @@ static NSString * const reuseIdentifier = @"Cell";
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingString:[NSString stringWithFormat:@"%@.png", name]];
-    
+
     NSData *img = [NSData dataWithContentsOfFile:filePath];
     UIImage *image = [UIImage imageWithData:img];
     
