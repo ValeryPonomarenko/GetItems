@@ -9,19 +9,44 @@
 #import "JournalItemsCollectionViewController.h"
 #import "ItemCollectionViewCell.h"
 #import "JournalItem.h"
+#import <CoreData/CoreData.h>
 
 @interface JournalItemsCollectionViewController ()
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionVIew;
 @property (nonatomic, strong) NSMutableArray* array;
+@property (strong) NSManagedObjectContext *managedObjectContext;
 @end
 
 @implementation JournalItemsCollectionViewController
 
 static NSString * const reuseIdentifier = @"Cell";
 
+- (void)initializeCoreData
+{
+    NSURL *modelURL = [[NSBundle mainBundle] URLForResource:@"ModelJournalData" withExtension:@"momd"];
+    NSManagedObjectModel *mom = [[NSManagedObjectModel alloc] initWithContentsOfURL:modelURL];
+    NSAssert(mom != nil, @"Error initializing Managed Object Model");
+    
+    NSPersistentStoreCoordinator *psc = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:mom];
+    NSManagedObjectContext *moc = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSMainQueueConcurrencyType];
+    [moc setPersistentStoreCoordinator:psc];
+    [self setManagedObjectContext:moc];
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSURL *documentsURL = [[fileManager URLsForDirectory:NSDocumentDirectory inDomains:NSUserDomainMask] lastObject];
+    NSURL *storeURL = [documentsURL URLByAppendingPathComponent:@"DataModel.sqlite"];
+    
+    dispatch_async(dispatch_get_global_queue( DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^(void) {
+        NSError *error = nil;
+        NSPersistentStoreCoordinator *psc = [[self managedObjectContext] persistentStoreCoordinator];
+        NSPersistentStore *store = [psc addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:0 error:&error];
+        NSAssert(store != nil, @"Error initializing PSC: %@\n%@", [error localizedDescription], [error userInfo]);
+    });
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
 
+    [self initializeCoreData];
     [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
 
     self.array = [[NSMutableArray alloc] init];
@@ -66,13 +91,31 @@ static NSString * const reuseIdentifier = @"Cell";
             journalItem.shortName = item[@"shortName"];
             journalItem.publishedDate = item[@"publishedDate"];
             journalItem.smallCoverId = [item[@"smallCoverId"] integerValue];
-
+            
+            [self saveIntoCoreData:item];
             [self.array addObject:journalItem];
         }
         
         dispatch_async(dispatch_get_main_queue(), ^{ [self makeView]; });
     }];
     [task resume];
+}
+
+- (void)saveIntoCoreData:(JournalItem *)item
+{
+
+    NSManagedObjectContext *context = [self managedObjectContext];
+    NSManagedObject *transaction = [NSEntityDescription insertNewObjectForEntityForName:@"Item" inManagedObjectContext:context];
+    
+    //[transaction setValue:item.publishedDate forKey:@"publishedData"];
+    [transaction setValue:item.shortName forKey:@"shortName"];
+    //[transaction setValue:[NSString stringWithFormat:@"%d", item.smallCoverId] forKey:@"smallCoverId"];
+    
+    NSError *error = nil;
+    if(![context save:&error])
+    {
+        NSLog(@"Save Failed! %@ %@", error, [error localizedDescription]);
+    }
 }
 
 - (void)downloadJournalImages:(JournalItem *)item withCell:(ItemCollectionViewCell *)cell
