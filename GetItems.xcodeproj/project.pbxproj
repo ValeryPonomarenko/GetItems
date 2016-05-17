@@ -16,6 +16,8 @@
 		2D0993F21CE1D94900ACB896 /* ModelJournalData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2D0993F01CE1D94900ACB896 /* ModelJournalData.xcdatamodeld */; };
 		2D0994021CE1FF2B00ACB896 /* ItemCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D0994011CE1FF2B00ACB896 /* ItemCollectionViewCell.m */; };
 		2D0994051CE2012C00ACB896 /* JournalItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D0994041CE2012C00ACB896 /* JournalItem.m */; };
+		2D7545221CEB00F000C64524 /* Item+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D75451F1CEB00F000C64524 /* Item+CoreDataProperties.m */; };
+		2D7545231CEB00F000C64524 /* Item.m in Sources */ = {isa = PBXBuildFile; fileRef = 2D7545211CEB00F000C64524 /* Item.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +36,10 @@
 		2D0994011CE1FF2B00ACB896 /* ItemCollectionViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ItemCollectionViewCell.m; path = ../ItemCollectionViewCell.m; sourceTree = "<group>"; };
 		2D0994031CE2012C00ACB896 /* JournalItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JournalItem.h; sourceTree = "<group>"; };
 		2D0994041CE2012C00ACB896 /* JournalItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JournalItem.m; sourceTree = "<group>"; };
+		2D75451E1CEB00F000C64524 /* Item+CoreDataProperties.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "Item+CoreDataProperties.h"; path = "GetItems/Item+CoreDataProperties.h"; sourceTree = "<group>"; };
+		2D75451F1CEB00F000C64524 /* Item+CoreDataProperties.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "Item+CoreDataProperties.m"; path = "GetItems/Item+CoreDataProperties.m"; sourceTree = "<group>"; };
+		2D7545201CEB00F000C64524 /* Item.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Item.h; path = GetItems/Item.h; sourceTree = "<group>"; };
+		2D7545211CEB00F000C64524 /* Item.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = Item.m; path = GetItems/Item.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +56,10 @@
 		2D0993CA1CE1D73E00ACB896 = {
 			isa = PBXGroup;
 			children = (
+				2D75451E1CEB00F000C64524 /* Item+CoreDataProperties.h */,
+				2D75451F1CEB00F000C64524 /* Item+CoreDataProperties.m */,
+				2D7545201CEB00F000C64524 /* Item.h */,
+				2D7545211CEB00F000C64524 /* Item.m */,
 				2D0993D51CE1D73E00ACB896 /* GetItems */,
 				2D0993D41CE1D73E00ACB896 /* Products */,
 			);
@@ -72,8 +82,8 @@
 				2D0994031CE2012C00ACB896 /* JournalItem.h */,
 				2D0994041CE2012C00ACB896 /* JournalItem.m */,
 				2D0993F01CE1D94900ACB896 /* ModelJournalData.xcdatamodeld */,
-				2D0993ED1CE1D89100ACB896 /* JournalItemsCollectionViewController.h */,
 				2D0993EE1CE1D89100ACB896 /* JournalItemsCollectionViewController.m */,
+				2D0993ED1CE1D89100ACB896 /* JournalItemsCollectionViewController.h */,
 				2D0993E21CE1D73E00ACB896 /* Assets.xcassets */,
 				2D0993E41CE1D73E00ACB896 /* LaunchScreen.storyboard */,
 				2D0993E71CE1D73E00ACB896 /* Info.plist */,
@@ -162,7 +172,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2D7545231CEB00F000C64524 /* Item.m in Sources */,
 				2D0994021CE1FF2B00ACB896 /* ItemCollectionViewCell.m in Sources */,
+				2D7545221CEB00F000C64524 /* Item+CoreDataProperties.m in Sources */,
 				2D0993EF1CE1D89100ACB896 /* JournalItemsCollectionViewController.m in Sources */,
 				2D0994051CE2012C00ACB896 /* JournalItem.m in Sources */,
 				2D0993DB1CE1D73E00ACB896 /* AppDelegate.m in Sources */,
@@ -320,6 +332,7 @@
 				2D0993EC1CE1D73E00ACB896 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 

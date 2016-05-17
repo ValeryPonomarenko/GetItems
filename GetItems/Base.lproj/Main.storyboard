@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15E65" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="LbC-KN-GI9">
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
     </dependencies>
@@ -9,7 +8,6 @@
         <!--Journal Items Collection View Controller-->
         <scene sceneID="R1N-7d-gFb">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="yLt-5t-SpO" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <collectionViewController id="LbC-KN-GI9" customClass="JournalItemsCollectionViewController" sceneMemberID="viewController">
                     <collectionView key="view" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" id="e48-rB-5eI">
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
@@ -77,6 +75,7 @@
                         <outlet property="collectionVIew" destination="e48-rB-5eI" id="W9N-Qx-8T1"/>
                     </connections>
                 </collectionViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yLt-5t-SpO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="552" y="502"/>
         </scene>
