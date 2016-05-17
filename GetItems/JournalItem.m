@@ -10,4 +10,14 @@
 
 @implementation JournalItem
 
+- (BOOL)isEqual:(id)object
+{
+    if([object isKindOfClass:[self class]])
+    {
+        if([self.shortName isEqual:[object shortName]])
+            return YES;
+    }
+    return NO;
+}
+
 @end

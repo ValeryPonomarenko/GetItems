@@ -15,4 +15,6 @@
 @property (nonatomic, strong) UIImage *smallCover;
 @property (nonatomic, strong) NSURL *imgUrl;
 @property (nonatomic) NSInteger smallCoverId;
+
+- (BOOL)isEqual:(id)object;
 @end
