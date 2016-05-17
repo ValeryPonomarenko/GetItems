@@ -43,7 +43,7 @@ static NSString * const reuseIdentifier = @"Cell";
     
     void (^downloadData)(NSData *data, NSURLResponse *response, NSError *error) = ^void(NSData *data, NSURLResponse *response, NSError *error)
     {
-        NSLog(@"downloadData");
+        //если интернет соединения нет, то data будет nil, а значит ничего делать больше не надо
         if(!data)
             return;
         
@@ -63,7 +63,7 @@ static NSString * const reuseIdentifier = @"Cell";
             }
         }
         
-        dispatch_async(dispatch_get_main_queue(), ^{ [self makeView]; });
+        dispatch_async(dispatch_get_main_queue(), ^{ [self.collectionView reloadData]; });
     };
     
     
@@ -135,30 +135,12 @@ static NSString * const reuseIdentifier = @"Cell";
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
-- (void)makeView
-{
-    [self.collectionView reloadData];
-    return;
-    [self.collectionView performBatchUpdates:^
-    {
-        NSMutableArray *arrayWithIndexPaths = [NSMutableArray array];
-        
-        for(int i = 0; i < [self.array count]; i++)
-        {
-            [arrayWithIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:0]];
-        }
-        [self.collectionView insertItemsAtIndexPaths:arrayWithIndexPaths];
-    } completion:nil];
-}
-
 - (void)saveImage:(NSString *)name andImage:(UIImage *)image
 {
     NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
     NSString *filePath = [[paths objectAtIndex:0] stringByAppendingString:[NSString stringWithFormat:@"%@.png", name]];
     
     [UIImagePNGRepresentation(image) writeToFile:filePath atomically:YES];
-    
-    NSLog(@"saveImage: %@", filePath);
 }
 
 - (UIImage *)getImage:(NSString *)name
@@ -178,22 +160,18 @@ static NSString * const reuseIdentifier = @"Cell";
     return 1;
 }
 
-
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return [self.array count];
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    ItemCollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"ItemCell" forIndexPath:indexPath];
-    
     JournalItem *item = [self.array objectAtIndex:indexPath.row];
-    
-    cell.publishedDate.text = item.publishedDate;
-    cell.title.text = item.shortName;
-    
     item.smallCover = [self getImage:[NSString stringWithFormat: @"%ld", (long)item.smallCoverId]];
     
+    ItemCollectionViewCell* cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"ItemCell" forIndexPath:indexPath];
+    cell.publishedDate.text = item.publishedDate;
+    cell.title.text = item.shortName;
     if(item.smallCover == nil)
         [self downloadJournalImages:item withCell:cell];
     else
