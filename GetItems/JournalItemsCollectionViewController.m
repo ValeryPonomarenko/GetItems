@@ -43,9 +43,23 @@ static NSString * const reuseIdentifier = @"Cell";
     
     void (^downloadData)(NSData *data, NSURLResponse *response, NSError *error) = ^void(NSData *data, NSURLResponse *response, NSError *error)
     {
-        //если интернет соединения нет, то data будет nil, а значит ничего делать больше не надо
         if(!data)
+        {
+            //нет интернет соединения
+            UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"No network connection"
+                                                                           message:@"You must be connected to the internet to download the newest journals."
+                                                                    preferredStyle:UIAlertControllerStyleAlert];
+            
+            UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK"
+                                                         style:UIAlertActionStyleDefault
+                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                           [alert dismissViewControllerAnimated:YES completion:nil];
+                                                         }];
+            [alert addAction:ok];
+            
+            [self presentViewController:alert animated:YES completion:nil];
             return;
+        }
         
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
         
@@ -66,8 +80,7 @@ static NSString * const reuseIdentifier = @"Cell";
         dispatch_async(dispatch_get_main_queue(), ^{ [self.collectionView reloadData]; });
     };
     
-    
-    NSURL *url = [[NSURL alloc] initWithString:@"http://pubbledone.devsky.ru/api/items?appId=deus"];
+    NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@api/items?appId=%@", SERVER_ADDRESS, USER_ID]];
     [self.downloader downloadWithUrl:url andCompletionHandler:downloadData];
 }
 
@@ -110,7 +123,7 @@ static NSString * const reuseIdentifier = @"Cell";
         [self.downloader downloadWithUrl:item.imgUrl andCompletionHandler:downloadImg];
     };
     
-    NSString *imgPath = [NSString stringWithFormat:@"http://pubbledone.devsky.ru/api/images/%ld", (long)item.smallCoverId];
+    NSString *imgPath = [NSString stringWithFormat:@"%@api/images/%ld", SERVER_ADDRESS, (long)item.smallCoverId];
     NSURL *url = [[NSURL alloc] initWithString:imgPath];
     
     [self.downloader downloadWithUrl:url andCompletionHandler:downloadImgUrl];
@@ -120,12 +133,12 @@ static NSString * const reuseIdentifier = @"Cell";
 {
     NSManagedObjectContext *context = [self managedObjectContext];
     
-    NSManagedObject *newDevice = [NSEntityDescription insertNewObjectForEntityForName:@"Item"
+    NSManagedObject *newItem = [NSEntityDescription insertNewObjectForEntityForName:@"Item"
                                                                inManagedObjectContext:context];
     
-    [newDevice setValue:item.shortName forKey:@"shortName"];
-    [newDevice setValue:item.publishedDate forKey:@"publishedDate"];
-    [newDevice setValue:[NSString stringWithFormat:@"%ld", (long)item.smallCoverId] forKey:@"smallCoverId"];
+    [newItem setValue:item.shortName forKey:@"shortName"];
+    [newItem setValue:item.publishedDate forKey:@"publishedDate"];
+    [newItem setValue:[NSString stringWithFormat:@"%ld", (long)item.smallCoverId] forKey:@"smallCoverId"];
     
     NSError *error = nil;
     if(![context save:&error])
