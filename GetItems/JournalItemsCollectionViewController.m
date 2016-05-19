@@ -52,7 +52,7 @@ static NSString * const reuseIdentifier = @"Cell";
             
             UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK"
                                                          style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction * _Nonnull action) {
+                                                       handler:^(UIAlertAction *action) {
                                                            [alert dismissViewControllerAnimated:YES completion:nil];
                                                          }];
             [alert addAction:ok];

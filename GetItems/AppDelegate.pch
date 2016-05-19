@@ -1,0 +1,16 @@
+//
+//  AppDelegate.pch
+//  GetItems
+//
+//  Created by Valery Ponomarenko on 18/05/16.
+//  Copyright © 2016 Valery Ponomarenko. All rights reserved.
+//
+
+#ifndef AppDelegate_pch
+#define AppDelegate_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#import "BasicDefines.h"
+
+#endif /* AppDelegate_pch */
