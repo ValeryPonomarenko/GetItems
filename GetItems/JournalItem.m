@@ -10,14 +10,23 @@
 
 @implementation JournalItem
 
-- (BOOL)isEqual:(id)object
+- (JournalItem *)initWithDictionary:(NSDictionary *)dictionary
 {
-    if([object isKindOfClass:[self class]])
+    JournalItem *item = [[JournalItem alloc] init];
+    
+    if(item)
     {
-        if([self.shortName isEqual:[object shortName]])
-            return YES;
+        item.shortName = [dictionary valueForKey:@"shortName"];
+        item.publishedDate = [dictionary valueForKey:@"publishedDate"];
+        item.smallCoverId = [[dictionary valueForKey:@"smallCoverId"] integerValue];
     }
-    return NO;
+    
+    return item;
+}
+
+- (BOOL)isEqual:(JournalItem *)object
+{
+    return [object isKindOfClass:[self class]] && [[self shortName] isEqual:[object shortName]];
 }
 
 @end

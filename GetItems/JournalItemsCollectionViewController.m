@@ -15,12 +15,12 @@
 @interface JournalItemsCollectionViewController ()
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionVIew;
 @property (nonatomic, strong) NSMutableArray *array;
-@property (nonatomic, strong) DataDownloader *downloader;
+
 @end
 
 @implementation JournalItemsCollectionViewController
 
-static NSString * const reuseIdentifier = @"Cell";
+typedef void (^DownloadDataBlock)(NSData *data, NSURLResponse *response, NSError *error);
 
 - (NSManagedObjectContext *)managedObjectContext
 {
@@ -35,13 +35,11 @@ static NSString * const reuseIdentifier = @"Cell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self.collectionView registerClass:[UICollectionViewCell class] forCellWithReuseIdentifier:reuseIdentifier];
 
-    self.array = [[NSMutableArray alloc] init];
-    self.downloader = [[DataDownloader alloc] init];
+    self.array = [NSMutableArray array];
     [self fillArrayFromCoreData];
     
-    void (^downloadData)(NSData *data, NSURLResponse *response, NSError *error) = ^void(NSData *data, NSURLResponse *response, NSError *error)
+    DownloadDataBlock downloadData = ^void(NSData *data, NSURLResponse *response, NSError *error)
     {
         if(!data)
         {
@@ -52,9 +50,7 @@ static NSString * const reuseIdentifier = @"Cell";
             
             UIAlertAction *ok = [UIAlertAction actionWithTitle:@"OK"
                                                          style:UIAlertActionStyleDefault
-                                                       handler:^(UIAlertAction *action) {
-                                                           [alert dismissViewControllerAnimated:YES completion:nil];
-                                                         }];
+                                                       handler:nil];
             [alert addAction:ok];
             
             [self presentViewController:alert animated:YES completion:nil];
@@ -63,12 +59,9 @@ static NSString * const reuseIdentifier = @"Cell";
         
         NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
         
-        for(id item in dict[@"_embedded"][@"items"])
+        for(NSDictionary *item in dict[@"_embedded"][@"items"])
         {
-            JournalItem *journalItem= [[JournalItem alloc] init];
-            journalItem.shortName = item[@"shortName"];
-            journalItem.publishedDate = item[@"publishedDate"];
-            journalItem.smallCoverId = [item[@"smallCoverId"] integerValue];
+            JournalItem *journalItem = [[JournalItem alloc] initWithDictionary:item];
             
             if(![self.array containsObject:journalItem])
             {
@@ -81,7 +74,7 @@ static NSString * const reuseIdentifier = @"Cell";
     };
     
     NSURL *url = [[NSURL alloc] initWithString:[NSString stringWithFormat:@"%@api/items?appId=%@", SERVER_ADDRESS, USER_ID]];
-    [self.downloader downloadWithUrl:url andCompletionHandler:downloadData];
+    [DataDownloader downloadWithUrl:url andCompletionHandler:downloadData];
 }
 
 - (void)fillArrayFromCoreData
@@ -92,12 +85,9 @@ static NSString * const reuseIdentifier = @"Cell";
     
     items = [[managedObjectContext executeFetchRequest:fetchRequest error:nil] mutableCopy];
     
-    for(id item in items)
+    for(NSDictionary *item in items)
     {
-        JournalItem *journalItem= [[JournalItem alloc] init];
-        journalItem.shortName = [item valueForKey:@"shortName"];
-        journalItem.publishedDate = [item valueForKey:@"publishedDate"];
-        journalItem.smallCoverId = [[item valueForKey:@"smallCoverId"] integerValue];
+        JournalItem *journalItem = [[JournalItem alloc] initWithDictionary:item];
         
         [self.array addObject:journalItem];
     }
@@ -105,7 +95,7 @@ static NSString * const reuseIdentifier = @"Cell";
 
 - (void)downloadJournalImages:(JournalItem *)item withCell:(ItemCollectionViewCell *)cell
 {
-    void (^downloadImg)(NSData *data, NSURLResponse *response, NSError *error) = ^void(NSData *data, NSURLResponse *response, NSError *error)
+    DownloadDataBlock downloadImg = ^void(NSData *data, NSURLResponse *response, NSError *error)
     {
         item.smallCover = [UIImage imageWithData:data];
         [self saveImage:[NSString  stringWithFormat:@"%ld", (long)item.smallCoverId] andImage:[UIImage imageWithData:data]];
@@ -113,20 +103,20 @@ static NSString * const reuseIdentifier = @"Cell";
         dispatch_async(dispatch_get_main_queue(), ^{ cell.image.image = item.smallCover; });
     };
     
-    void (^downloadImgUrl)(NSData *data, NSURLResponse *response, NSError *error) = ^void(NSData *data, NSURLResponse *response, NSError *error)
+    DownloadDataBlock downloadImgUrl = ^void(NSData *data, NSURLResponse *response, NSError *error)
     {
         if(!data)
             return;
         
         item.imgUrl = [[NSURL alloc] initWithString:[NSJSONSerialization JSONObjectWithData:data options:0 error:nil][@"filePath"]];
         
-        [self.downloader downloadWithUrl:item.imgUrl andCompletionHandler:downloadImg];
+        [DataDownloader downloadWithUrl:item.imgUrl andCompletionHandler:downloadImg];
     };
     
     NSString *imgPath = [NSString stringWithFormat:@"%@api/images/%ld", SERVER_ADDRESS, (long)item.smallCoverId];
     NSURL *url = [[NSURL alloc] initWithString:imgPath];
     
-    [self.downloader downloadWithUrl:url andCompletionHandler:downloadImgUrl];
+    [DataDownloader downloadWithUrl:url andCompletionHandler:downloadImgUrl];
 }
 
 - (void)saveIntoCoreData:(JournalItem *)item

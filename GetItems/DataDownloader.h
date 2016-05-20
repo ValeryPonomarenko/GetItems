@@ -9,5 +9,5 @@
 #import <Foundation/Foundation.h>
 
 @interface DataDownloader : NSObject
-- (void)downloadWithUrl:(NSURL *)url andCompletionHandler:(void (^)(NSData *data, NSURLResponse *response, NSError *error))handler;
++ (void)downloadWithUrl:(NSURL *)url andCompletionHandler:(void (^)(NSData *data, NSURLResponse *response, NSError *error))handler;
 @end

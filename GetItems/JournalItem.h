@@ -10,11 +10,12 @@
 #import <UIKit/UIKit.h>
 
 @interface JournalItem : NSObject
-@property (nonatomic, strong) NSString *shortName;
 @property (nonatomic, strong) NSString *publishedDate;
-@property (nonatomic, strong) UIImage *smallCover;
-@property (nonatomic, strong) NSURL *imgUrl;
+@property (nonatomic, strong) NSString *shortName;
 @property (nonatomic) NSInteger smallCoverId;
 
-- (BOOL)isEqual:(id)object;
+@property (nonatomic, strong) UIImage *smallCover;
+@property (nonatomic, strong) NSURL *imgUrl;
+
+- (JournalItem *)initWithDictionary: (NSDictionary *)dictionary;
 @end
